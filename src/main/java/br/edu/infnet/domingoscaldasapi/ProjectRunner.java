@@ -53,15 +53,15 @@ public class ProjectRunner implements CommandLineRunner {
 
 	private void carregarDados() {
 
-		instrutorService.incluir(new Instrutor(1L, "Ricardo Almeida", "ricardo@bjjschool.com.br",
-				"(21) 99999-0001", Faixa.PRETA, 3, "CBJJ-12345", true));
+		instrutorService.incluir(new Instrutor(1L, "Domingos Caldas", "domingojr@bjjschool.com.br", "(21) 99999-0001",
+				Faixa.PRETA, 3, "CBJJ-484817", true));
 
 		Aluno anderson = new Aluno(1L, "Anderson Souza", "anderson@gmail.com", "(21) 98888-0002",
 				LocalDate.of(1995, 3, 10), LocalDate.of(2024, 2, 1), 82.5, true, Faixa.AZUL, 1);
 		Aluno beatriz = new Aluno(2L, "Beatriz Lima", "beatriz@gmail.com", "(21) 97777-0003",
 				LocalDate.of(2000, 11, 25), LocalDate.of(2025, 6, 15), 61.0, true, Faixa.BRANCA, 2);
-		Aluno carlos = new Aluno(3L, "Carlos Pereira", "carlos@gmail.com", "(21) 96666-0004",
-				LocalDate.of(1988, 7, 2), LocalDate.of(2023, 9, 10), 94.3, false, Faixa.ROXA, 4);
+		Aluno carlos = new Aluno(3L, "Carlos Pereira", "carlos@gmail.com", "(21) 96666-0004", LocalDate.of(1988, 7, 2),
+				LocalDate.of(2023, 9, 10), 94.3, false, Faixa.ROXA, 4);
 
 		alunoService.incluir(anderson);
 		alunoService.incluir(beatriz);
@@ -70,8 +70,7 @@ public class ProjectRunner implements CommandLineRunner {
 		carregarPresencas(anderson, 1L, LocalDate.of(2026, 1, 5), 58);
 		carregarPresencas(beatriz, 100L, LocalDate.of(2026, 8, 11), 5);
 
-		Campeonato copaRio = new Campeonato(1L, "Copa Rio de Jiu-Jitsu", "Rio de Janeiro",
-				LocalDate.of(2026, 5, 17));
+		Campeonato copaRio = new Campeonato(1L, "Copa Rio de Jiu-Jitsu", "Rio de Janeiro", LocalDate.of(2026, 5, 17));
 		campeonatoService.incluir(copaRio);
 
 		Conquista ouroAnderson = new Conquista(1L, "Adulto Azul Pena", Medalha.OURO, copaRio);
@@ -91,9 +90,8 @@ public class ProjectRunner implements CommandLineRunner {
 		graduacaoService.incluir(azulBeatriz);
 
 		System.out.println("\nDados carregados: " + alunoService.obterLista().size() + " alunos, "
-				+ instrutorService.obterLista().size() + " instrutor(es), "
-				+ presencaService.obterLista().size() + " presenças, "
-				+ conquistaService.obterLista().size() + " conquistas, "
+				+ instrutorService.obterLista().size() + " instrutor(es), " + presencaService.obterLista().size()
+				+ " presenças, " + conquistaService.obterLista().size() + " conquistas, "
 				+ graduacaoService.obterLista().size() + " graduação(ões).");
 	}
 
@@ -119,8 +117,8 @@ public class ProjectRunner implements CommandLineRunner {
 
 		System.out.println("\n--- CRUD através da camada de serviço ---");
 
-		Aluno diego = new Aluno(4L, "Diego Ramos", "diego@gmail.com", "(21) 95555-0005",
-				LocalDate.of(1999, 1, 30), LocalDate.of(2026, 8, 1), 77.0, true, Faixa.BRANCA, 0);
+		Aluno diego = new Aluno(4L, "Diego Ramos", "diego@gmail.com", "(21) 95555-0005", LocalDate.of(1999, 1, 30),
+				LocalDate.of(2026, 8, 1), 77.0, true, Faixa.BRANCA, 0);
 		alunoService.incluir(diego);
 		System.out.println("Incluído:  " + alunoService.obterPorId(4L));
 
@@ -146,12 +144,12 @@ public class ProjectRunner implements CommandLineRunner {
 		System.out.println("Alunos da faixa AZUL (filtragem):");
 		alunoService.obterPorFaixa(Faixa.AZUL).forEach(aluno -> System.out.println("  " + aluno.getNome()));
 
-		System.out.println("Nomes em ordem alfabética (transformação + ordenação): "
-				+ alunoService.obterNomesOrdenados());
+		System.out.println(
+				"Nomes em ordem alfabética (transformação + ordenação): " + alunoService.obterNomesOrdenados());
 
 		System.out.println("Alunos por frequência (ordenação):");
-		alunoService.ordenarPorFrequencia().forEach(aluno -> System.out.println("  " + aluno.getNome() + " -> "
-				+ aluno.getPresencas().size() + " presença(s)"));
+		alunoService.ordenarPorFrequencia().forEach(aluno -> System.out
+				.println("  " + aluno.getNome() + " -> " + aluno.getPresencas().size() + " presença(s)"));
 
 		System.out.println("Presenças entre 01/08/2026 e 15/08/2026 (filtragem por período): "
 				+ presencaService.obterPorPeriodo(LocalDate.of(2026, 8, 1), LocalDate.of(2026, 8, 15)).size());
@@ -159,9 +157,10 @@ public class ProjectRunner implements CommandLineRunner {
 		System.out.println("Quadro de medalhas (agrupamento): " + conquistaService.obterQuadroDeMedalhas());
 
 		System.out.println("Pontos para graduação (presenças + medalhas desde a última graduação):");
-		alunoService.obterLista().forEach(aluno -> System.out.println("  " + aluno.getNome() + " ("
-				+ aluno.getFaixa() + ", mínimo " + aluno.getFaixa().getPresencasMinimasPorGrau() + ") -> "
-				+ alunoService.calcularPontosDesdeUltimaGraduacao(aluno) + " ponto(s)"));
+		alunoService.obterLista()
+				.forEach(aluno -> System.out.println("  " + aluno.getNome() + " (" + aluno.getFaixa() + ", mínimo "
+						+ aluno.getFaixa().getPresencasMinimasPorGrau() + ") -> "
+						+ alunoService.calcularPontosDesdeUltimaGraduacao(aluno) + " ponto(s)"));
 
 		System.out.println("Alunos aptos a novo grau/faixa:");
 		alunoService.obterAptosParaGraduacao().forEach(aluno -> System.out.println("  " + aluno.getNome()));
