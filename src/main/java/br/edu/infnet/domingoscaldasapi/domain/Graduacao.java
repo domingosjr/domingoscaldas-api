@@ -2,6 +2,8 @@ package br.edu.infnet.domingoscaldasapi.domain;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 /**
  * Registro histórico de uma graduação do aluno: nova faixa ou novo grau na
  * faixa atual (grau 0 representa a troca de faixa).
@@ -12,6 +14,7 @@ public class Graduacao implements Identificavel {
 	private Faixa faixa;
 	private int grau;
 	private LocalDate data;
+	@JsonBackReference("aluno-graduacoes")
 	private Aluno aluno;
 
 	public Graduacao() {

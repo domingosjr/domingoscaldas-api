@@ -1,0 +1,205 @@
+{
+	"info": {
+		"name": "domingoscaldas-api (BJJ School)",
+		"description": "Testes da API REST do projeto da disciplina Desenvolvimento de aplicações Java com Spring Boot. Base URL: {{baseUrl}} (padrão http://localhost:8080). Rode a aplicação com ./mvnw spring-boot:run — o ProjectRunner já carrega dados de demonstração.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:8080" }
+	],
+	"item": [
+		{
+			"name": "Alunos",
+			"item": [
+				{ "name": "obterLista", "request": { "method": "GET", "url": "{{baseUrl}}/alunos" } },
+				{ "name": "obterPorId", "request": { "method": "GET", "url": "{{baseUrl}}/alunos/1" } },
+				{ "name": "obterPorId - inexistente (404)", "request": { "method": "GET", "url": "{{baseUrl}}/alunos/999" } },
+				{ "name": "obterPorNome (?nome=)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/alunos?nome=sou", "host": ["{{baseUrl}}"], "path": ["alunos"], "query": [{ "key": "nome", "value": "sou" }] } } },
+				{ "name": "obterPorFaixa (?faixa=)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/alunos?faixa=AZUL", "host": ["{{baseUrl}}"], "path": ["alunos"], "query": [{ "key": "faixa", "value": "AZUL" }] } } },
+				{ "name": "obterAtivos (?ativos=true)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/alunos?ativos=true", "host": ["{{baseUrl}}"], "path": ["alunos"], "query": [{ "key": "ativos", "value": "true" }] } } },
+				{ "name": "obterAptosParaGraduacao (?aptosGraduacao=true)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/alunos?aptosGraduacao=true", "host": ["{{baseUrl}}"], "path": ["alunos"], "query": [{ "key": "aptosGraduacao", "value": "true" }] } } },
+				{ "name": "ordenarPorFrequencia (?ordenarPor=frequencia)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/alunos?ordenarPor=frequencia", "host": ["{{baseUrl}}"], "path": ["alunos"], "query": [{ "key": "ordenarPor", "value": "frequencia" }] } } },
+				{ "name": "obterPontosGraduacao", "request": { "method": "GET", "url": "{{baseUrl}}/alunos/1/pontos-graduacao" } },
+				{
+					"name": "incluir (201)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"id\": 10,\n  \"nome\": \"Diego Ramos\",\n  \"email\": \"diego@gmail.com\",\n  \"telefone\": \"(21) 95555-0005\",\n  \"dataNascimento\": \"1999-01-30\",\n  \"dataMatricula\": \"2026-08-01\",\n  \"peso\": 77.0,\n  \"ativo\": true,\n  \"faixa\": \"BRANCA\",\n  \"graus\": 0\n}" },
+						"url": "{{baseUrl}}/alunos"
+					}
+				},
+				{
+					"name": "incluir - id duplicado (409)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"id\": 1,\n  \"nome\": \"Outro Anderson\",\n  \"email\": \"outro@gmail.com\",\n  \"telefone\": \"(21) 90000-0000\",\n  \"faixa\": \"BRANCA\"\n}" },
+						"url": "{{baseUrl}}/alunos"
+					}
+				},
+				{
+					"name": "incluir - sem id (400)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"nome\": \"Sem Identificador\"\n}" },
+						"url": "{{baseUrl}}/alunos"
+					}
+				},
+				{
+					"name": "alterar (200)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"nome\": \"Diego Ramos\",\n  \"email\": \"diego@gmail.com\",\n  \"telefone\": \"(21) 94444-0006\",\n  \"dataNascimento\": \"1999-01-30\",\n  \"dataMatricula\": \"2026-08-01\",\n  \"peso\": 78.0,\n  \"ativo\": true,\n  \"faixa\": \"BRANCA\",\n  \"graus\": 1\n}" },
+						"url": "{{baseUrl}}/alunos/10"
+					}
+				},
+				{ "name": "excluir (204)", "request": { "method": "DELETE", "url": "{{baseUrl}}/alunos/10" } },
+				{
+					"name": "Sub-recursos do aluno",
+					"item": [
+						{ "name": "obterPresencas", "request": { "method": "GET", "url": "{{baseUrl}}/alunos/1/presencas" } },
+						{
+							"name": "registrarPresenca (201)",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"id\": 500,\n  \"data\": \"2026-08-17\",\n  \"tipoTreino\": \"Gi\"\n}" },
+								"url": "{{baseUrl}}/alunos/2/presencas"
+							}
+						},
+						{ "name": "obterConquistas", "request": { "method": "GET", "url": "{{baseUrl}}/alunos/1/conquistas" } },
+						{
+							"name": "registrarConquista (201) ?campeonatoId=1",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"id\": 50,\n  \"categoria\": \"Adulto Azul Medio\",\n  \"medalha\": \"BRONZE\"\n}" },
+								"url": { "raw": "{{baseUrl}}/alunos/2/conquistas?campeonatoId=1", "host": ["{{baseUrl}}"], "path": ["alunos", "2", "conquistas"], "query": [{ "key": "campeonatoId", "value": "1" }] }
+							}
+						},
+						{ "name": "obterGraduacoes", "request": { "method": "GET", "url": "{{baseUrl}}/alunos/2/graduacoes" } },
+						{
+							"name": "registrarGraduacao (201) - atualiza faixa/graus do aluno",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"id\": 30,\n  \"faixa\": \"AZUL\",\n  \"grau\": 1,\n  \"data\": \"2026-08-17\"\n}" },
+								"url": "{{baseUrl}}/alunos/2/graduacoes"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Instrutores",
+			"item": [
+				{ "name": "obterLista", "request": { "method": "GET", "url": "{{baseUrl}}/instrutores" } },
+				{ "name": "obterPorId", "request": { "method": "GET", "url": "{{baseUrl}}/instrutores/1" } },
+				{
+					"name": "incluir (201)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"id\": 2,\n  \"nome\": \"Marcelo Garcia\",\n  \"email\": \"marcelo@bjjschool.com.br\",\n  \"telefone\": \"(21) 98888-1111\",\n  \"faixa\": \"PRETA\",\n  \"graus\": 4,\n  \"registroFederacao\": \"CBJJ-99999\",\n  \"ativo\": true\n}" },
+						"url": "{{baseUrl}}/instrutores"
+					}
+				},
+				{
+					"name": "alterar (200)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"nome\": \"Marcelo Garcia\",\n  \"email\": \"marcelo@bjjschool.com.br\",\n  \"telefone\": \"(21) 98888-2222\",\n  \"faixa\": \"PRETA\",\n  \"graus\": 5,\n  \"registroFederacao\": \"CBJJ-99999\",\n  \"ativo\": true\n}" },
+						"url": "{{baseUrl}}/instrutores/2"
+					}
+				},
+				{ "name": "alterar - inexistente (404)", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Ninguem\"\n}" }, "url": "{{baseUrl}}/instrutores/444" } },
+				{ "name": "excluir (204)", "request": { "method": "DELETE", "url": "{{baseUrl}}/instrutores/2" } }
+			]
+		},
+		{
+			"name": "Campeonatos",
+			"item": [
+				{ "name": "obterLista", "request": { "method": "GET", "url": "{{baseUrl}}/campeonatos" } },
+				{ "name": "obterPorId", "request": { "method": "GET", "url": "{{baseUrl}}/campeonatos/1" } },
+				{
+					"name": "incluir (201)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"id\": 2,\n  \"nome\": \"Brasileiro de Jiu-Jitsu\",\n  \"cidade\": \"Barueri\",\n  \"data\": \"2026-10-04\"\n}" },
+						"url": "{{baseUrl}}/campeonatos"
+					}
+				},
+				{
+					"name": "alterar (200)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"nome\": \"Brasileiro de Jiu-Jitsu 2026\",\n  \"cidade\": \"Barueri\",\n  \"data\": \"2026-10-05\"\n}" },
+						"url": "{{baseUrl}}/campeonatos/2"
+					}
+				},
+				{ "name": "excluir (204)", "request": { "method": "DELETE", "url": "{{baseUrl}}/campeonatos/2" } }
+			]
+		},
+		{
+			"name": "Presencas",
+			"item": [
+				{ "name": "obterLista", "request": { "method": "GET", "url": "{{baseUrl}}/presencas" } },
+				{ "name": "obterPorId", "request": { "method": "GET", "url": "{{baseUrl}}/presencas/1" } },
+				{ "name": "obterPorPeriodo (?inicio&fim)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/presencas?inicio=2026-08-01&fim=2026-08-15", "host": ["{{baseUrl}}"], "path": ["presencas"], "query": [{ "key": "inicio", "value": "2026-08-01" }, { "key": "fim", "value": "2026-08-15" }] } } },
+				{
+					"name": "alterar (200)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"data\": \"2026-01-05\",\n  \"tipoTreino\": \"No-Gi\"\n}" },
+						"url": "{{baseUrl}}/presencas/1"
+					}
+				},
+				{ "name": "excluir (204)", "request": { "method": "DELETE", "url": "{{baseUrl}}/presencas/1" } }
+			]
+		},
+		{
+			"name": "Conquistas",
+			"item": [
+				{ "name": "obterLista", "request": { "method": "GET", "url": "{{baseUrl}}/conquistas" } },
+				{ "name": "obterPorId", "request": { "method": "GET", "url": "{{baseUrl}}/conquistas/1" } },
+				{ "name": "obterPorMedalha (?medalha=)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/conquistas?medalha=OURO", "host": ["{{baseUrl}}"], "path": ["conquistas"], "query": [{ "key": "medalha", "value": "OURO" }] } } },
+				{ "name": "obterQuadroDeMedalhas", "request": { "method": "GET", "url": "{{baseUrl}}/conquistas/quadro-medalhas" } },
+				{
+					"name": "alterar (200)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"categoria\": \"Adulto Azul Pena\",\n  \"medalha\": \"PRATA\"\n}" },
+						"url": "{{baseUrl}}/conquistas/1"
+					}
+				},
+				{ "name": "excluir (204)", "request": { "method": "DELETE", "url": "{{baseUrl}}/conquistas/3" } }
+			]
+		},
+		{
+			"name": "Graduacoes",
+			"item": [
+				{ "name": "obterLista", "request": { "method": "GET", "url": "{{baseUrl}}/graduacoes" } },
+				{ "name": "obterPorId", "request": { "method": "GET", "url": "{{baseUrl}}/graduacoes/1" } },
+				{
+					"name": "alterar (200)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"faixa\": \"AZUL\",\n  \"grau\": 0,\n  \"data\": \"2026-08-09\"\n}" },
+						"url": "{{baseUrl}}/graduacoes/1"
+					}
+				},
+				{ "name": "excluir (204)", "request": { "method": "DELETE", "url": "{{baseUrl}}/graduacoes/1" } }
+			]
+		}
+	]
+}

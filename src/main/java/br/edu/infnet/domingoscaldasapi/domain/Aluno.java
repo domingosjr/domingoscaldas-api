@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Aluno da escola de Jiu-Jitsu. Mantém a faixa/graus atuais e os históricos
  * de presenças (frequência), conquistas em campeonatos e graduações.
@@ -17,8 +20,14 @@ public class Aluno extends Pessoa {
 	private boolean ativo;
 	private Faixa faixa;
 	private int graus;
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonManagedReference("aluno-presencas")
 	private final List<Presenca> presencas = new ArrayList<>();
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonManagedReference("aluno-conquistas")
 	private final List<Conquista> conquistas = new ArrayList<>();
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonManagedReference("aluno-graduacoes")
 	private final List<Graduacao> graduacoes = new ArrayList<>();
 
 	public Aluno() {

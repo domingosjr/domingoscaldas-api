@@ -1,5 +1,7 @@
 package br.edu.infnet.domingoscaldasapi.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 /**
  * Conquista (título) de um aluno em um campeonato: medalha e categoria disputada.
  * Também é considerada nos critérios de graduação.
@@ -10,6 +12,7 @@ public class Conquista implements Identificavel {
 	private String categoria;
 	private Medalha medalha;
 	private Campeonato campeonato;
+	@JsonBackReference("aluno-conquistas")
 	private Aluno aluno;
 
 	public Conquista() {

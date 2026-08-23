@@ -18,7 +18,7 @@ public abstract class BaseService<T extends Identificavel> {
 
 	private final Map<Long, T> dados = new LinkedHashMap<>();
 
-	public void incluir(T objeto) {
+	public T incluir(T objeto) {
 		validarObjeto(objeto);
 
 		if (dados.containsKey(objeto.getId())) {
@@ -27,13 +27,17 @@ public abstract class BaseService<T extends Identificavel> {
 		}
 
 		dados.put(objeto.getId(), objeto);
+
+		return objeto;
 	}
 
-	public void alterar(T objeto) {
+	public T alterar(T objeto) {
 		validarObjeto(objeto);
 		verificarExistencia(objeto.getId());
 
 		dados.put(objeto.getId(), objeto);
+
+		return objeto;
 	}
 
 	public void excluir(Long id) {

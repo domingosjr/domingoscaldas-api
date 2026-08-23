@@ -4,20 +4,68 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import br.edu.infnet.domingoscaldasapi.domain.Aluno;
 import br.edu.infnet.domingoscaldasapi.domain.Conquista;
 import br.edu.infnet.domingoscaldasapi.domain.Faixa;
 import br.edu.infnet.domingoscaldasapi.domain.Graduacao;
+import br.edu.infnet.domingoscaldasapi.domain.Presenca;
 
 /**
  * Regras de negócio dos alunos, incluindo as consultas com Streams e o
  * critério de aptidão para graduação (frequência + conquistas em campeonatos).
  */
+@Service
 public class AlunoService extends BaseService<Aluno> {
 
 	private static final int PONTOS_MEDALHA_OURO = 10;
 	private static final int PONTOS_MEDALHA_PRATA = 5;
 	private static final int PONTOS_MEDALHA_BRONZE = 3;
+
+	private final PresencaService presencaService;
+	private final ConquistaService conquistaService;
+	private final GraduacaoService graduacaoService;
+	private final CampeonatoService campeonatoService;
+
+	public AlunoService(PresencaService presencaService, ConquistaService conquistaService,
+			GraduacaoService graduacaoService, CampeonatoService campeonatoService) {
+		this.presencaService = presencaService;
+		this.conquistaService = conquistaService;
+		this.graduacaoService = graduacaoService;
+		this.campeonatoService = campeonatoService;
+	}
+
+	/**
+	 * Registra uma presença para o aluno: vincula ao aluno e armazena no serviço de presenças.
+	 */
+	public Presenca registrarPresenca(Long alunoId, Presenca presenca) {
+		Aluno aluno = obterPorId(alunoId);
+		aluno.adicionarPresenca(presenca);
+
+		return presencaService.incluir(presenca);
+	}
+
+	/**
+	 * Registra uma conquista do aluno em um campeonato existente.
+	 */
+	public Conquista registrarConquista(Long alunoId, Long campeonatoId, Conquista conquista) {
+		Aluno aluno = obterPorId(alunoId);
+		conquista.setCampeonato(campeonatoService.obterPorId(campeonatoId));
+		aluno.adicionarConquista(conquista);
+
+		return conquistaService.incluir(conquista);
+	}
+
+	/**
+	 * Registra uma graduação: atualiza faixa/graus do aluno e guarda o histórico.
+	 */
+	public Graduacao registrarGraduacao(Long alunoId, Graduacao graduacao) {
+		Aluno aluno = obterPorId(alunoId);
+		aluno.adicionarGraduacao(graduacao);
+
+		return graduacaoService.incluir(graduacao);
+	}
 
 	public List<Aluno> obterAtivos() {
 		return obterLista().stream()

@@ -2,6 +2,8 @@ package br.edu.infnet.domingoscaldasapi.domain;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 /**
  * Presença de um aluno em um treino. A frequência é o principal critério
  * para a graduação de graus e faixas.
@@ -11,6 +13,7 @@ public class Presenca implements Identificavel {
 	private Long id;
 	private LocalDate data;
 	private String tipoTreino;
+	@JsonBackReference("aluno-presencas")
 	private Aluno aluno;
 
 	public Presenca() {

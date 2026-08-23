@@ -32,17 +32,28 @@ import br.edu.infnet.domingoscaldasapi.service.PresencaService;
 @Component
 public class ProjectRunner implements CommandLineRunner {
 
-	private final AlunoService alunoService = new AlunoService();
-	private final InstrutorService instrutorService = new InstrutorService();
-	private final PresencaService presencaService = new PresencaService();
-	private final CampeonatoService campeonatoService = new CampeonatoService();
-	private final ConquistaService conquistaService = new ConquistaService();
-	private final GraduacaoService graduacaoService = new GraduacaoService();
+	private final AlunoService alunoService;
+	private final InstrutorService instrutorService;
+	private final PresencaService presencaService;
+	private final CampeonatoService campeonatoService;
+	private final ConquistaService conquistaService;
+	private final GraduacaoService graduacaoService;
+
+	public ProjectRunner(AlunoService alunoService, InstrutorService instrutorService,
+			PresencaService presencaService, CampeonatoService campeonatoService,
+			ConquistaService conquistaService, GraduacaoService graduacaoService) {
+		this.alunoService = alunoService;
+		this.instrutorService = instrutorService;
+		this.presencaService = presencaService;
+		this.campeonatoService = campeonatoService;
+		this.conquistaService = conquistaService;
+		this.graduacaoService = graduacaoService;
+	}
 
 	@Override
 	public void run(String... args) throws Exception {
 
-		System.out.println("===== BJJ School - demonstração (etapa 2: services + coleções) =====");
+		System.out.println("===== BJJ School - demonstração (services + coleções; API REST em /alunos, /presencas...) =====");
 
 		carregarDados();
 		demonstrarHerancaEPolimorfismo();
