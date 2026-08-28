@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import br.edu.infnet.domingoscaldasapi.domain.Presenca;
 import br.edu.infnet.domingoscaldasapi.service.PresencaService;
 
@@ -49,10 +51,8 @@ public class PresencaController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Presenca> alterar(@PathVariable Long id, @RequestBody Presenca presenca) {
-		presenca.setId(id);
-
-		return ResponseEntity.ok(presencaService.alterar(presenca));
+	public ResponseEntity<Presenca> alterar(@PathVariable Long id, @Valid @RequestBody Presenca presenca) {
+		return ResponseEntity.ok(presencaService.alterar(id, presenca));
 	}
 
 	@DeleteMapping("/{id}")

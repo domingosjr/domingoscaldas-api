@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import jakarta.validation.Valid;
+
 import br.edu.infnet.domingoscaldasapi.domain.Campeonato;
 import br.edu.infnet.domingoscaldasapi.service.CampeonatoService;
 
@@ -41,7 +43,7 @@ public class CampeonatoController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Campeonato> incluir(@RequestBody Campeonato campeonato) {
+	public ResponseEntity<Campeonato> incluir(@Valid @RequestBody Campeonato campeonato) {
 		Campeonato incluido = campeonatoService.incluir(campeonato);
 
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -51,10 +53,8 @@ public class CampeonatoController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Campeonato> alterar(@PathVariable Long id, @RequestBody Campeonato campeonato) {
-		campeonato.setId(id);
-
-		return ResponseEntity.ok(campeonatoService.alterar(campeonato));
+	public ResponseEntity<Campeonato> alterar(@PathVariable Long id, @Valid @RequestBody Campeonato campeonato) {
+		return ResponseEntity.ok(campeonatoService.alterar(id, campeonato));
 	}
 
 	@DeleteMapping("/{id}")

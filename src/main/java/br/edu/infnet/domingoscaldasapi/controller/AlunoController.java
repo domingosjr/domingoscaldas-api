@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+
+import jakarta.validation.Valid;
+
 import br.edu.infnet.domingoscaldasapi.domain.Aluno;
 import br.edu.infnet.domingoscaldasapi.domain.Conquista;
 import br.edu.infnet.domingoscaldasapi.domain.Faixa;
@@ -36,18 +41,20 @@ public class AlunoController {
 		this.alunoService = alunoService;
 	}
 
+	@Operation(summary = "Lista todos os alunos", description = "Retorna todos os alunos cadastrados na escola")
 	@GetMapping
 	public ResponseEntity<List<Aluno>> obterLista() {
 		return ResponseEntity.ok(alunoService.obterLista());
 	}
 
+	@Operation(summary = "Consulta um aluno pelo identificador")
 	@GetMapping("/{id}")
 	public ResponseEntity<Aluno> obterPorId(@PathVariable Long id) {
 		return ResponseEntity.ok(alunoService.obterPorId(id));
 	}
 
 	@GetMapping(params = "nome")
-	public ResponseEntity<List<Aluno>> obterPorNome(@RequestParam String nome) {
+	public ResponseEntity<List<Aluno>> obterPorNome(@Parameter(description = "Trecho do nome do aluno") @RequestParam String nome) {
 		return ResponseEntity.ok(alunoService.buscarPorNome(nome));
 	}
 
@@ -77,17 +84,15 @@ public class AlunoController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Aluno> incluir(@RequestBody Aluno aluno) {
+	public ResponseEntity<Aluno> incluir(@Valid @RequestBody Aluno aluno) {
 		Aluno incluido = alunoService.incluir(aluno);
 
 		return ResponseEntity.created(montarLocation(incluido.getId())).body(incluido);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Aluno> alterar(@PathVariable Long id, @RequestBody Aluno aluno) {
-		aluno.setId(id);
-
-		return ResponseEntity.ok(alunoService.alterar(aluno));
+	public ResponseEntity<Aluno> alterar(@PathVariable Long id, @Valid @RequestBody Aluno aluno) {
+		return ResponseEntity.ok(alunoService.alterar(id, aluno));
 	}
 
 	@DeleteMapping("/{id}")
@@ -105,7 +110,7 @@ public class AlunoController {
 	}
 
 	@PostMapping("/{id}/presencas")
-	public ResponseEntity<Presenca> registrarPresenca(@PathVariable Long id, @RequestBody Presenca presenca) {
+	public ResponseEntity<Presenca> registrarPresenca(@PathVariable Long id, @Valid @RequestBody Presenca presenca) {
 		Presenca registrada = alunoService.registrarPresenca(id, presenca);
 
 		return ResponseEntity.created(montarLocation("/presencas", registrada.getId())).body(registrada);
@@ -118,7 +123,7 @@ public class AlunoController {
 
 	@PostMapping("/{id}/conquistas")
 	public ResponseEntity<Conquista> registrarConquista(@PathVariable Long id, @RequestParam Long campeonatoId,
-			@RequestBody Conquista conquista) {
+			@Valid @RequestBody Conquista conquista) {
 		Conquista registrada = alunoService.registrarConquista(id, campeonatoId, conquista);
 
 		return ResponseEntity.created(montarLocation("/conquistas", registrada.getId())).body(registrada);
@@ -130,7 +135,7 @@ public class AlunoController {
 	}
 
 	@PostMapping("/{id}/graduacoes")
-	public ResponseEntity<Graduacao> registrarGraduacao(@PathVariable Long id, @RequestBody Graduacao graduacao) {
+	public ResponseEntity<Graduacao> registrarGraduacao(@PathVariable Long id, @Valid @RequestBody Graduacao graduacao) {
 		Graduacao registrada = alunoService.registrarGraduacao(id, graduacao);
 
 		return ResponseEntity.created(montarLocation("/graduacoes", registrada.getId())).body(registrada);

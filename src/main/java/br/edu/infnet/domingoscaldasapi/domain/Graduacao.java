@@ -4,17 +4,43 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+
 /**
  * Registro histórico de uma graduação do aluno: nova faixa ou novo grau na
  * faixa atual (grau 0 representa a troca de faixa).
  */
+@Entity
+@Table(name = "graduacoes")
 public class Graduacao implements Identificavel {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	@NotNull(message = "A faixa deve ser informada")
+	@Enumerated(EnumType.STRING)
 	private Faixa faixa;
+
+	@PositiveOrZero(message = "O grau não pode ser negativo")
 	private int grau;
+
+	@NotNull(message = "A data da graduação deve ser informada")
 	private LocalDate data;
+
 	@JsonBackReference("aluno-graduacoes")
+	@ManyToOne
+	@JoinColumn(name = "aluno_id")
 	private Aluno aluno;
 
 	public Graduacao() {

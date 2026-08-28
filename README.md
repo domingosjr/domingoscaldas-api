@@ -17,17 +17,21 @@ Relacionamentos um-para-muitos: `Aluno` 1-N `Presenca`, `Aluno` 1-N `Conquista`,
 
 ## Como executar
 
-Requisitos: JDK 17+ e Maven.
+Requisitos: JDK 17+ (o Maven Wrapper baixa o Maven sozinho).
 
 ```bash
-mvn spring-boot:run
+./mvnw spring-boot:run
 ```
 
-A rotina de inicialização (`ProjectRunner`) carrega dados de demonstração pela camada de serviço e exercita o modelo no console. A API sobe em `http://localhost:8080`.
+A API sobe em `http://localhost:8080` com banco **H2 em memória**. A rotina de inicialização (`ProjectRunner`) persiste dados de demonstração pela camada de serviço e exercita o modelo no console (desative com `app.runner.habilitado=false` no `application.properties`).
+
+- **Console do H2:** http://localhost:8080/h2-console (JDBC URL `jdbc:h2:mem:domingoscaldasdb`, usuário `sa`, senha em branco).
 
 ## API REST
 
-Arquitetura: Cliente HTTP → `Controller` → `Service` → `Map` (armazenamento em memória até a etapa 4).
+Arquitetura: Cliente HTTP → `Controller` → `Service` → `Repository` → Banco de dados (H2).
+
+Persistência com **Spring Data JPA**: entidades mapeadas com `@Entity`/`@Id`/`@GeneratedValue(IDENTITY)`; herança `Pessoa` → `Aluno`/`Instrutor` com estratégia **JOINED**; relacionamentos um-para-muitos com `@OneToMany(mappedBy)`/`@ManyToOne` + `@JoinColumn` (`aluno_id`, `campeonato_id`); consultas derivadas (`findByAtivoTrue`, `findByNomeContainingIgnoreCase`, `findByFaixa`, `findAllByOrderByNomeAsc`, `findByDataBetween`, `findByMedalha`); **Bean Validation** (`@NotBlank`, `@Size`, `@Email`, `@NotNull`, `@PositiveOrZero`) com `@Valid` nos controllers. Os identificadores agora são gerados pelo banco — o POST não recebe `id`.
 
 | Recurso | Endpoints |
 |---|---|
@@ -40,7 +44,7 @@ Arquitetura: Cliente HTTP → `Controller` → `Service` → `Map` (armazenament
 | `/conquistas` | `GET` lista/id · `?medalha=OURO` · `GET /quadro-medalhas` · `PUT` · `DELETE` |
 | `/graduacoes` | `GET` lista/id · `PUT` · `DELETE` |
 
-Códigos HTTP: `200 OK`, `201 Created`, `204 No Content`, `400 Bad Request` (dados inválidos), `404 Not Found` (id inexistente), `409 Conflict` (id duplicado) — tratados centralmente no `GlobalExceptionHandler` (`@RestControllerAdvice`).
+Códigos HTTP: `200 OK`, `201 Created` (+ header `Location`), `204 No Content`, `400 Bad Request` (dados inválidos / Bean Validation, com os campos e mensagens no corpo), `404 Not Found` (id inexistente) — tratados centralmente no `GlobalExceptionHandler` (`@RestControllerAdvice`), sempre com o corpo padronizado `ErroResponse` (status, erro, mensagem, dataHora).
 
 - **Documentação OpenAPI/Swagger:** http://localhost:8080/swagger-ui.html (JSON em `/v3/api-docs`).
 - **Collection Postman:** [`postman/domingoscaldas-api.postman_collection.json`](postman/domingoscaldas-api.postman_collection.json) — importar no Postman; variável `baseUrl` já aponta para `http://localhost:8080`.
@@ -50,6 +54,6 @@ Códigos HTTP: `200 OK`, `201 Created`, `204 No Content`, `400 Bad Request` (dad
 - **etapa-1** — Orientação a Objetos: modelo de negócio (classes, herança, interface `Identificavel`, relacionamentos, enums) + rotina de inicialização no console.
 - **etapa-2** — Estruturas de Dados e Serviços: armazenamento em memória com `Map`, camada `Service` (CRUD), consultas com Collections/lambdas/Streams e exceções customizadas.
 - **etapa-3** — API REST com Spring Boot: controllers REST (GET/POST/PUT/DELETE), injeção de dependência por construtor, `ResponseEntity` com códigos HTTP adequados, `@RestControllerAdvice`, Swagger e collection Postman.
-- **etapa-4** — Persistência com Spring Data JPA *(a fazer)*.
+- **etapa-4** — Persistência com Spring Data JPA: repositories, entidades JPA (herança JOINED, relacionamentos com FK), consultas derivadas `findBy...`, Bean Validation e banco H2 substituindo os Maps em memória.
 
 Cada etapa concluída é registrada com uma tag git (`etapa-1`, `etapa-2`, ...).

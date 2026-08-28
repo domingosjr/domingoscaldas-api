@@ -1,26 +1,58 @@
 package br.edu.infnet.domingoscaldasapi.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import br.edu.infnet.domingoscaldasapi.domain.Graduacao;
+import br.edu.infnet.domingoscaldasapi.exception.RecursoNaoEncontradoException;
+import br.edu.infnet.domingoscaldasapi.repository.GraduacaoRepository;
 
 /**
- * Regras de negócio das graduações (CRUD herdado do serviço genérico).
+ * Regras de negócio do histórico de graduações.
  */
 @Service
-public class GraduacaoService extends BaseService<Graduacao> {
+public class GraduacaoService {
+
+	private final GraduacaoRepository graduacaoRepository;
+
+	public GraduacaoService(GraduacaoRepository graduacaoRepository) {
+		this.graduacaoRepository = graduacaoRepository;
+	}
+
+	public List<Graduacao> obterLista() {
+		return graduacaoRepository.findAll();
+	}
+
+	public Graduacao obterPorId(Long id) {
+		return graduacaoRepository.findById(id).orElseThrow(
+				() -> new RecursoNaoEncontradoException("Nenhum recurso encontrado para esse identificador: " + id));
+	}
+
+	public Graduacao incluir(Graduacao graduacao) {
+
+		if (graduacao == null) {
+			throw new IllegalArgumentException("A graduação não pode ser nula!");
+		}
+
+		return graduacaoRepository.save(graduacao);
+	}
 
 	/**
-	 * Atualiza a graduação existente no lugar (a mesma instância está no
-	 * histórico do aluno), preservando o vínculo com o aluno.
+	 * Atualiza a graduação existente no lugar, preservando o vínculo com o aluno.
 	 */
-	@Override
-	public Graduacao alterar(Graduacao graduacao) {
-		Graduacao atual = obterPorId(graduacao.getId());
-		atual.setFaixa(graduacao.getFaixa());
-		atual.setGrau(graduacao.getGrau());
-		atual.setData(graduacao.getData());
+	public Graduacao alterar(Long id, Graduacao graduacao) {
+		Graduacao existente = obterPorId(id);
+		existente.setFaixa(graduacao.getFaixa());
+		existente.setGrau(graduacao.getGrau());
+		existente.setData(graduacao.getData());
 
-		return super.alterar(atual);
+		return graduacaoRepository.save(existente);
+	}
+
+	public void excluir(Long id) {
+		Graduacao graduacao = obterPorId(id);
+
+		graduacaoRepository.delete(graduacao);
 	}
 }

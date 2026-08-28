@@ -2,14 +2,34 @@ package br.edu.infnet.domingoscaldasapi.domain;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 /**
  * Campeonato de Jiu-Jitsu em que os alunos competem.
  */
+@Entity
+@Table(name = "campeonatos")
 public class Campeonato implements Identificavel {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	@NotBlank(message = "O nome deve ser informado")
+	@Size(max = 120, message = "O nome deve possuir no máximo 120 caracteres")
 	private String nome;
+
+	@Size(max = 80, message = "A cidade deve possuir no máximo 80 caracteres")
 	private String cidade;
+
+	@NotNull(message = "A data deve ser informada")
 	private LocalDate data;
 
 	public Campeonato() {

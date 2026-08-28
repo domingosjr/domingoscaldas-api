@@ -4,16 +4,39 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 /**
  * Presença de um aluno em um treino. A frequência é o principal critério
  * para a graduação de graus e faixas.
  */
+@Entity
+@Table(name = "presencas")
 public class Presenca implements Identificavel {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	@NotNull(message = "A data da presença deve ser informada")
 	private LocalDate data;
+
+	@NotBlank(message = "O tipo de treino deve ser informado")
+	@Size(max = 30, message = "O tipo de treino deve possuir no máximo 30 caracteres")
 	private String tipoTreino;
+
 	@JsonBackReference("aluno-presencas")
+	@ManyToOne
+	@JoinColumn(name = "aluno_id")
 	private Aluno aluno;
 
 	public Presenca() {

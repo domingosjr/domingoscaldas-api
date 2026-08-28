@@ -8,28 +8,59 @@ import org.springframework.stereotype.Service;
 
 import br.edu.infnet.domingoscaldasapi.domain.Conquista;
 import br.edu.infnet.domingoscaldasapi.domain.Medalha;
+import br.edu.infnet.domingoscaldasapi.exception.RecursoNaoEncontradoException;
+import br.edu.infnet.domingoscaldasapi.repository.ConquistaRepository;
 
 /**
  * Regras de negócio das conquistas em campeonatos.
  */
 @Service
-public class ConquistaService extends BaseService<Conquista> {
+public class ConquistaService {
 
-	/**
-	 * Atualiza a conquista existente no lugar (a mesma instância está na lista
-	 * do aluno), preservando o vínculo com o aluno; o campeonato só muda se informado.
-	 */
-	@Override
-	public Conquista alterar(Conquista conquista) {
-		Conquista atual = obterPorId(conquista.getId());
-		atual.setCategoria(conquista.getCategoria());
-		atual.setMedalha(conquista.getMedalha());
+	private final ConquistaRepository conquistaRepository;
 
-		if (conquista.getCampeonato() != null) {
-			atual.setCampeonato(conquista.getCampeonato());
+	public ConquistaService(ConquistaRepository conquistaRepository) {
+		this.conquistaRepository = conquistaRepository;
+	}
+
+	public List<Conquista> obterLista() {
+		return conquistaRepository.findAll();
+	}
+
+	public Conquista obterPorId(Long id) {
+		return conquistaRepository.findById(id).orElseThrow(
+				() -> new RecursoNaoEncontradoException("Nenhum recurso encontrado para esse identificador: " + id));
+	}
+
+	public Conquista incluir(Conquista conquista) {
+
+		if (conquista == null) {
+			throw new IllegalArgumentException("A conquista não pode ser nula!");
 		}
 
-		return super.alterar(atual);
+		return conquistaRepository.save(conquista);
+	}
+
+	/**
+	 * Atualiza a conquista existente no lugar, preservando o vínculo com o
+	 * aluno; o campeonato só muda se informado.
+	 */
+	public Conquista alterar(Long id, Conquista conquista) {
+		Conquista existente = obterPorId(id);
+		existente.setCategoria(conquista.getCategoria());
+		existente.setMedalha(conquista.getMedalha());
+
+		if (conquista.getCampeonato() != null) {
+			existente.setCampeonato(conquista.getCampeonato());
+		}
+
+		return conquistaRepository.save(existente);
+	}
+
+	public void excluir(Long id) {
+		Conquista conquista = obterPorId(id);
+
+		conquistaRepository.delete(conquista);
 	}
 
 	public List<Conquista> obterPorMedalha(Medalha medalha) {
@@ -38,9 +69,7 @@ public class ConquistaService extends BaseService<Conquista> {
 			throw new IllegalArgumentException("A medalha não pode ser nula!");
 		}
 
-		return obterLista().stream()
-				.filter(conquista -> conquista.getMedalha() == medalha)
-				.toList();
+		return conquistaRepository.findByMedalha(medalha);
 	}
 
 	/**

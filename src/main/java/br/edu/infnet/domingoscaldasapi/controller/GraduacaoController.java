@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import br.edu.infnet.domingoscaldasapi.domain.Graduacao;
 import br.edu.infnet.domingoscaldasapi.service.GraduacaoService;
 
@@ -39,10 +41,8 @@ public class GraduacaoController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Graduacao> alterar(@PathVariable Long id, @RequestBody Graduacao graduacao) {
-		graduacao.setId(id);
-
-		return ResponseEntity.ok(graduacaoService.alterar(graduacao));
+	public ResponseEntity<Graduacao> alterar(@PathVariable Long id, @Valid @RequestBody Graduacao graduacao) {
+		return ResponseEntity.ok(graduacaoService.alterar(id, graduacao));
 	}
 
 	@DeleteMapping("/{id}")

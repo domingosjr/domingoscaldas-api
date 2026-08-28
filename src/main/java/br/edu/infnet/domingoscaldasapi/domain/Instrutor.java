@@ -1,11 +1,22 @@
 package br.edu.infnet.domingoscaldasapi.domain;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+
 /**
  * Instrutor responsável pelos treinos e pelas graduações dos alunos.
  */
+@Entity
+@Table(name = "instrutores")
 public class Instrutor extends Pessoa {
 
+	@NotNull(message = "A faixa deve ser informada")
+	@Enumerated(EnumType.STRING)
 	private Faixa faixa;
+
 	private int graus;
 	private String registroFederacao;
 	private boolean ativo;

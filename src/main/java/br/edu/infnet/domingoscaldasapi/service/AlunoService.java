@@ -11,33 +11,81 @@ import br.edu.infnet.domingoscaldasapi.domain.Conquista;
 import br.edu.infnet.domingoscaldasapi.domain.Faixa;
 import br.edu.infnet.domingoscaldasapi.domain.Graduacao;
 import br.edu.infnet.domingoscaldasapi.domain.Presenca;
+import br.edu.infnet.domingoscaldasapi.exception.RecursoNaoEncontradoException;
+import br.edu.infnet.domingoscaldasapi.repository.AlunoRepository;
 
 /**
- * Regras de negócio dos alunos, incluindo as consultas com Streams e o
- * critério de aptidão para graduação (frequência + conquistas em campeonatos).
+ * Regras de negócio dos alunos: CRUD via repository, consultas derivadas,
+ * registro de presenças/conquistas/graduações e o critério de aptidão para
+ * graduação (frequência + conquistas em campeonatos).
  */
 @Service
-public class AlunoService extends BaseService<Aluno> {
+public class AlunoService {
 
 	private static final int PONTOS_MEDALHA_OURO = 10;
 	private static final int PONTOS_MEDALHA_PRATA = 5;
 	private static final int PONTOS_MEDALHA_BRONZE = 3;
 
+	private final AlunoRepository alunoRepository;
 	private final PresencaService presencaService;
 	private final ConquistaService conquistaService;
 	private final GraduacaoService graduacaoService;
 	private final CampeonatoService campeonatoService;
 
-	public AlunoService(PresencaService presencaService, ConquistaService conquistaService,
-			GraduacaoService graduacaoService, CampeonatoService campeonatoService) {
+	public AlunoService(AlunoRepository alunoRepository, PresencaService presencaService,
+			ConquistaService conquistaService, GraduacaoService graduacaoService,
+			CampeonatoService campeonatoService) {
+		this.alunoRepository = alunoRepository;
 		this.presencaService = presencaService;
 		this.conquistaService = conquistaService;
 		this.graduacaoService = graduacaoService;
 		this.campeonatoService = campeonatoService;
 	}
 
+	public List<Aluno> obterLista() {
+		return alunoRepository.findAll();
+	}
+
+	public Aluno obterPorId(Long id) {
+		return alunoRepository.findById(id).orElseThrow(
+				() -> new RecursoNaoEncontradoException("Nenhum recurso encontrado para esse identificador: " + id));
+	}
+
+	public Aluno incluir(Aluno aluno) {
+		validarObjeto(aluno);
+
+		return alunoRepository.save(aluno);
+	}
+
 	/**
-	 * Registra uma presença para o aluno: vincula ao aluno e armazena no serviço de presenças.
+	 * O identificador da URL prevalece; os campos são copiados sobre a entidade
+	 * existente para não perder os históricos (presenças, conquistas, graduações).
+	 */
+	public Aluno alterar(Long id, Aluno aluno) {
+		validarObjeto(aluno);
+
+		Aluno existente = obterPorId(id);
+		existente.setNome(aluno.getNome());
+		existente.setEmail(aluno.getEmail());
+		existente.setTelefone(aluno.getTelefone());
+		existente.setDataNascimento(aluno.getDataNascimento());
+		existente.setDataMatricula(aluno.getDataMatricula());
+		existente.setPeso(aluno.getPeso());
+		existente.setAtivo(aluno.isAtivo());
+		existente.setFaixa(aluno.getFaixa());
+		existente.setGraus(aluno.getGraus());
+
+		return alunoRepository.save(existente);
+	}
+
+	public void excluir(Long id) {
+		Aluno aluno = obterPorId(id);
+
+		alunoRepository.delete(aluno);
+	}
+
+	/**
+	 * Registra uma presença para o aluno: vincula ao aluno e persiste.
 	 */
 	public Presenca registrarPresenca(Long alunoId, Presenca presenca) {
 		Aluno aluno = obterPorId(alunoId);
@@ -64,24 +112,20 @@ public class AlunoService extends BaseService<Aluno> {
 		Aluno aluno = obterPorId(alunoId);
 		aluno.adicionarGraduacao(graduacao);
 
-		return graduacaoService.incluir(graduacao);
+		Graduacao registrada = graduacaoService.incluir(graduacao);
+		alunoRepository.save(aluno);
+
+		return registrada;
 	}
 
 	public List<Aluno> obterAtivos() {
-		return obterLista().stream()
-				.filter(Aluno::isAtivo)
-				.toList();
+		return alunoRepository.findByAtivoTrue();
 	}
 
 	public List<Aluno> buscarPorNome(String termo) {
+		validarTermo(termo);
 
-		if (termo == null || termo.isBlank()) {
-			throw new IllegalArgumentException("O termo de busca não pode ser vazio!");
-		}
-
-		return obterLista().stream()
-				.filter(aluno -> aluno.getNome().toLowerCase().contains(termo.toLowerCase()))
-				.toList();
+		return alunoRepository.findByNomeContainingIgnoreCase(termo);
 	}
 
 	public List<Aluno> obterPorFaixa(Faixa faixa) {
@@ -90,15 +134,12 @@ public class AlunoService extends BaseService<Aluno> {
 			throw new IllegalArgumentException("A faixa não pode ser nula!");
 		}
 
-		return obterLista().stream()
-				.filter(aluno -> aluno.getFaixa() == faixa)
-				.toList();
+		return alunoRepository.findByFaixa(faixa);
 	}
 
 	public List<String> obterNomesOrdenados() {
-		return obterLista().stream()
+		return alunoRepository.findAllByOrderByNomeAsc().stream()
 				.map(Aluno::getNome)
-				.sorted()
 				.toList();
 	}
 
@@ -122,10 +163,7 @@ public class AlunoService extends BaseService<Aluno> {
 	}
 
 	public long calcularPontosDesdeUltimaGraduacao(Aluno aluno) {
-
-		if (aluno == null) {
-			throw new IllegalArgumentException("O aluno não pode ser nulo!");
-		}
+		validarObjeto(aluno);
 
 		LocalDate ultimaGraduacao = aluno.getGraduacoes().stream()
 				.map(Graduacao::getData)
@@ -151,5 +189,19 @@ public class AlunoService extends BaseService<Aluno> {
 			case PRATA -> PONTOS_MEDALHA_PRATA;
 			case BRONZE -> PONTOS_MEDALHA_BRONZE;
 		};
+	}
+
+	private void validarObjeto(Aluno aluno) {
+
+		if (aluno == null) {
+			throw new IllegalArgumentException("O aluno não pode ser nulo!");
+		}
+	}
+
+	private void validarTermo(String termo) {
+
+		if (termo == null || termo.isBlank()) {
+			throw new IllegalArgumentException("O termo de busca não pode ser vazio!");
+		}
 	}
 }

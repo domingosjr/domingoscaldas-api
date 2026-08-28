@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import br.edu.infnet.domingoscaldasapi.domain.Conquista;
 import br.edu.infnet.domingoscaldasapi.domain.Medalha;
 import br.edu.infnet.domingoscaldasapi.service.ConquistaService;
@@ -52,10 +54,8 @@ public class ConquistaController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Conquista> alterar(@PathVariable Long id, @RequestBody Conquista conquista) {
-		conquista.setId(id);
-
-		return ResponseEntity.ok(conquistaService.alterar(conquista));
+	public ResponseEntity<Conquista> alterar(@PathVariable Long id, @Valid @RequestBody Conquista conquista) {
+		return ResponseEntity.ok(conquistaService.alterar(id, conquista));
 	}
 
 	@DeleteMapping("/{id}")

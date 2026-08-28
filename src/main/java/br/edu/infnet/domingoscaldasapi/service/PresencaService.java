@@ -6,24 +6,54 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import br.edu.infnet.domingoscaldasapi.domain.Presenca;
+import br.edu.infnet.domingoscaldasapi.exception.RecursoNaoEncontradoException;
+import br.edu.infnet.domingoscaldasapi.repository.PresencaRepository;
 
 /**
  * Regras de negócio das presenças (frequência nos treinos).
  */
 @Service
-public class PresencaService extends BaseService<Presenca> {
+public class PresencaService {
+
+	private final PresencaRepository presencaRepository;
+
+	public PresencaService(PresencaRepository presencaRepository) {
+		this.presencaRepository = presencaRepository;
+	}
+
+	public List<Presenca> obterLista() {
+		return presencaRepository.findAll();
+	}
+
+	public Presenca obterPorId(Long id) {
+		return presencaRepository.findById(id).orElseThrow(
+				() -> new RecursoNaoEncontradoException("Nenhum recurso encontrado para esse identificador: " + id));
+	}
+
+	public Presenca incluir(Presenca presenca) {
+
+		if (presenca == null) {
+			throw new IllegalArgumentException("A presença não pode ser nula!");
+		}
+
+		return presencaRepository.save(presenca);
+	}
 
 	/**
-	 * Atualiza a presença existente no lugar (a mesma instância está na lista do
-	 * aluno), preservando o vínculo com o aluno.
+	 * Atualiza a presença existente no lugar, preservando o vínculo com o aluno.
 	 */
-	@Override
-	public Presenca alterar(Presenca presenca) {
-		Presenca atual = obterPorId(presenca.getId());
-		atual.setData(presenca.getData());
-		atual.setTipoTreino(presenca.getTipoTreino());
+	public Presenca alterar(Long id, Presenca presenca) {
+		Presenca existente = obterPorId(id);
+		existente.setData(presenca.getData());
+		existente.setTipoTreino(presenca.getTipoTreino());
 
-		return super.alterar(atual);
+		return presencaRepository.save(existente);
+	}
+
+	public void excluir(Long id) {
+		Presenca presenca = obterPorId(id);
+
+		presencaRepository.delete(presenca);
 	}
 
 	public List<Presenca> obterPorPeriodo(LocalDate inicio, LocalDate fim) {
@@ -32,8 +62,6 @@ public class PresencaService extends BaseService<Presenca> {
 			throw new IllegalArgumentException("O período não pode ser nulo!");
 		}
 
-		return obterLista().stream()
-				.filter(presenca -> !presenca.getData().isBefore(inicio) && !presenca.getData().isAfter(fim))
-				.toList();
+		return presencaRepository.findByDataBetween(inicio, fim);
 	}
 }

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import jakarta.validation.Valid;
+
 import br.edu.infnet.domingoscaldasapi.domain.Instrutor;
 import br.edu.infnet.domingoscaldasapi.service.InstrutorService;
 
@@ -41,7 +43,7 @@ public class InstrutorController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Instrutor> incluir(@RequestBody Instrutor instrutor) {
+	public ResponseEntity<Instrutor> incluir(@Valid @RequestBody Instrutor instrutor) {
 		Instrutor incluido = instrutorService.incluir(instrutor);
 
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -51,10 +53,8 @@ public class InstrutorController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Instrutor> alterar(@PathVariable Long id, @RequestBody Instrutor instrutor) {
-		instrutor.setId(id);
-
-		return ResponseEntity.ok(instrutorService.alterar(instrutor));
+	public ResponseEntity<Instrutor> alterar(@PathVariable Long id, @Valid @RequestBody Instrutor instrutor) {
+		return ResponseEntity.ok(instrutorService.alterar(id, instrutor));
 	}
 
 	@DeleteMapping("/{id}")
