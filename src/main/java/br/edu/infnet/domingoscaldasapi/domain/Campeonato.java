@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -28,6 +29,9 @@ public class Campeonato implements Identificavel {
 
 	@Size(max = 80, message = "A cidade deve possuir no máximo 80 caracteres")
 	private String cidade;
+
+	@Pattern(regexp = "\\d{8}", message = "O CEP deve possuir exatamente 8 dígitos numéricos")
+	private String cep;
 
 	@NotNull(message = "A data deve ser informada")
 	private LocalDate data;
@@ -67,6 +71,14 @@ public class Campeonato implements Identificavel {
 		this.cidade = cidade;
 	}
 
+	public String getCep() {
+		return cep;
+	}
+
+	public void setCep(String cep) {
+		this.cep = cep;
+	}
+
 	public LocalDate getData() {
 		return data;
 	}
@@ -77,6 +89,6 @@ public class Campeonato implements Identificavel {
 
 	@Override
 	public String toString() {
-		return String.format("Campeonato {id=%d, nome='%s', cidade='%s', data=%s}", id, nome, cidade, data);
+		return String.format("Campeonato {id=%d, nome='%s', cidade='%s', cep=%s, data=%s}", id, nome, cidade, cep, data);
 	}
 }

@@ -14,8 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+
 import jakarta.validation.Valid;
 
+import br.edu.infnet.domingoscaldasapi.client.EnderecoViaCep;
 import br.edu.infnet.domingoscaldasapi.domain.Campeonato;
 import br.edu.infnet.domingoscaldasapi.service.CampeonatoService;
 
@@ -40,6 +44,14 @@ public class CampeonatoController {
 	@GetMapping("/{id}")
 	public ResponseEntity<Campeonato> obterPorId(@PathVariable Long id) {
 		return ResponseEntity.ok(campeonatoService.obterPorId(id));
+	}
+
+	@Operation(summary = "Consulta um endereço pelo CEP",
+			description = "Integração com a API externa ViaCEP via OpenFeign (desafio adicional)")
+	@GetMapping("/consulta-cep/{cep}")
+	public ResponseEntity<EnderecoViaCep> consultarEnderecoPorCep(
+			@Parameter(description = "CEP com 8 dígitos, ex.: 20021130") @PathVariable String cep) {
+		return ResponseEntity.ok(campeonatoService.consultarEnderecoPorCep(cep));
 	}
 
 	@PostMapping

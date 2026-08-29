@@ -39,7 +39,8 @@ Persistência com **Spring Data JPA**: entidades mapeadas com `@Entity`/`@Id`/`@
 | `/alunos/{id}/presencas` | `GET` · `POST` registra presença do aluno |
 | `/alunos/{id}/conquistas` | `GET` · `POST ?campeonatoId=` registra conquista em campeonato |
 | `/alunos/{id}/graduacoes` | `GET` · `POST` registra graduação (atualiza faixa/graus do aluno) |
-| `/instrutores`, `/campeonatos` | CRUD completo |
+| `/instrutores` | CRUD completo |
+| `/campeonatos` | CRUD completo · `GET /consulta-cep/{cep}` (ViaCEP) |
 | `/presencas` | `GET` lista/id · `?inicio=&fim=` · `PUT` · `DELETE` |
 | `/conquistas` | `GET` lista/id · `?medalha=OURO` · `GET /quadro-medalhas` · `PUT` · `DELETE` |
 | `/graduacoes` | `GET` lista/id · `PUT` · `DELETE` |
@@ -49,11 +50,20 @@ Códigos HTTP: `200 OK`, `201 Created` (+ header `Location`), `204 No Content`, 
 - **Documentação OpenAPI/Swagger:** http://localhost:8080/swagger-ui.html (JSON em `/v3/api-docs`).
 - **Collection Postman:** [`postman/domingoscaldas-api.postman_collection.json`](postman/domingoscaldas-api.postman_collection.json) — importar no Postman; variável `baseUrl` já aponta para `http://localhost:8080`.
 
+## Desafio adicional — integração com API externa (OpenFeign)
+
+A aplicação também atua como **consumidora** de outro serviço: o client OpenFeign `ViaCepClient`
+consulta a API pública **ViaCEP**. Ao cadastrar/alterar um `Campeonato` informando o campo `cep`
+(8 dígitos), a **cidade é preenchida automaticamente** com a localidade/UF retornadas; há também o
+endpoint `GET /campeonatos/consulta-cep/{cep}` para consulta direta. CEP inexistente → `404`;
+CEP mal formado → `400`.
+
 ## Etapas do projeto
 
 - **etapa-1** — Orientação a Objetos: modelo de negócio (classes, herança, interface `Identificavel`, relacionamentos, enums) + rotina de inicialização no console.
 - **etapa-2** — Estruturas de Dados e Serviços: armazenamento em memória com `Map`, camada `Service` (CRUD), consultas com Collections/lambdas/Streams e exceções customizadas.
 - **etapa-3** — API REST com Spring Boot: controllers REST (GET/POST/PUT/DELETE), injeção de dependência por construtor, `ResponseEntity` com códigos HTTP adequados, `@RestControllerAdvice`, Swagger e collection Postman.
 - **etapa-4** — Persistência com Spring Data JPA: repositories, entidades JPA (herança JOINED, relacionamentos com FK), consultas derivadas `findBy...`, Bean Validation e banco H2 substituindo os Maps em memória.
+- **etapa-desafio** — Desafio adicional: integração com a API externa ViaCEP via OpenFeign.
 
 Cada etapa concluída é registrada com uma tag git (`etapa-1`, `etapa-2`, ...).

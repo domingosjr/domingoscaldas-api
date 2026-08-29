@@ -126,6 +126,17 @@
 			"item": [
 				{ "name": "obterLista", "request": { "method": "GET", "url": "{{baseUrl}}/campeonatos" } },
 				{ "name": "obterPorId", "request": { "method": "GET", "url": "{{baseUrl}}/campeonatos/1" } },
+				{ "name": "consultarEnderecoPorCep - ViaCEP (200)", "request": { "method": "GET", "url": "{{baseUrl}}/campeonatos/consulta-cep/20021130" } },
+				{ "name": "consultarEnderecoPorCep - inexistente (404)", "request": { "method": "GET", "url": "{{baseUrl}}/campeonatos/consulta-cep/99999999" } },
+				{
+					"name": "incluir com CEP - ViaCEP preenche a cidade (201)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"nome\": \"Rio Open de Jiu-Jitsu\",\n  \"cep\": \"22041011\",\n  \"data\": \"2026-11-14\"\n}" },
+						"url": "{{baseUrl}}/campeonatos"
+					}
+				},
 				{
 					"name": "incluir (201)",
 					"request": {
